@@ -1,0 +1,49 @@
+# {{ ansible_managed }}
+
+version: "3.4"
+
+services:
+  reverse-proxy:
+    image: traefik:v2.0
+    container_name: "traefik"
+    command:
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.secure.address=:443"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.main.acme.email={{ acme_email }}"
+      - "--certificatesresolvers.main.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.main.acme.dnschallenge=true"
+      - "--certificatesresolvers.main.acme.dnschallenge.provider=digitalocean"
+    environment:
+      DO_AUTH_TOKEN: {{ digitalocean_token }}
+    labels:
+      traefik.docker.network: {{ traefik_network }}
+
+      # redirect all http -> https
+      traefik.http.routers.traefik_http.rule: "HostRegexp(`{{ traefik_domain }}`, `{subdomain:[a-z]+}.{{ traefik_domain }}`)"
+      traefik.http.routers.traefik_http.entryPoints: "web"
+      traefik.http.routers.traefik_http.middlewares: "https_redirect"
+      traefik.http.middlewares.https_redirect.redirectscheme.scheme: "https"
+
+      # admin console
+      traefik.enable: "true"
+      traefik.http.routers.traefik.rule: "Host(`traefik.{{ traefik_domain }}`)"
+      traefik.http.routers.traefik.tls.certresolver: "main"
+      traefik.http.services.traefik.loadbalancer.server.port: "8080"
+      traefik.http.routers.traefik.service: "api@internal"
+      traefik.http.routers.traefik.middlewares: "traefik-auth"
+      traefik.http.middlewares.traefik-auth.basicauth.users: "{{ traefik_user }}:{{ traefik_password }}"
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+
+networks:
+  default:
+    external:
+      name: {{ traefik_network }}

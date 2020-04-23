@@ -1,0 +1,37 @@
+---
+- name: installation dependencies
+  apt:
+    name: "{{ item }} "
+    state: present
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+- name: add apt key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+- name: add apt repository
+  apt_repository:
+    repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
+    state: present
+- name: refresh apt cache
+  apt:
+    cache_valid_time: 3600
+    update_cache: yes
+- name: install docker
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - python3
+    - python3-pip
+- name: install docker-compose
+  pip:
+    name: docker-compose
+    state: latest

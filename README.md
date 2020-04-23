@@ -1,6 +1,6 @@
 # ansible
 
-This repo is all the ansible playbooks to configure alpinehq servers, most likely set up by [alpinehq/infrastructure](/alpinehq/infrastructure)
+This repo is all the ansible playbooks to configure alpinehq servers, most likely set up by [alpinehq/infrastructure](https://github.com/alpinehq/infrastructure)
 
 # Usage
 

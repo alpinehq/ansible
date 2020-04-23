@@ -9,11 +9,16 @@
     #     name: common
     #   tags:
     #     - setup
+    - name: Add github user keys
+      authorized_key:
+        user: root
+        key: https://github.com/mrasband.keys
+      tags:
+        - setup
     - include_role:
         name: docker
       tags:
         - setup
-
     # traefik setup/install
     - name: Create shared network
       docker_network:

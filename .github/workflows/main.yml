@@ -20,8 +20,11 @@ jobs:
       env:
         ANSIBLE_PASSWORD: ${{ secrets.ANSIBLE_PASSWORD }}
     - name: Set deploy key
-      run: echo "$DEPLOY_KEY" > id_rsa
+      run: |
+        mkdir -p ~/.ssh
+        echo -n "$DEPLOY_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
     - name: Run ansbile playbooks
-      run: ansible-playbook --private-key id_rsa web.yml
+      run: ansible-playbook --private-key ~/.ssh/id_rsa web.yml

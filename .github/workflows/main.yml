@@ -22,7 +22,7 @@ jobs:
     - name: Set deploy key
       run: |
         mkdir -p ~/.ssh
-        echo -n "$DEPLOY_KEY" > ~/.ssh/id_rsa
+        echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}

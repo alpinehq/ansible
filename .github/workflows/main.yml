@@ -17,5 +17,7 @@ jobs:
       run: python3 -m pip install --upgrade ansible
     - name: Set ansible password
       run: echo -n "$ANSIBLE_PASSWORD" > .pass
+      env:
+        ANSIBLE_PASSWORD: ${{ secrets.ANSIBLE_PASSWORD }}
     - name: Run ansbile playbooks
       run: ansible-playbook web.yml
